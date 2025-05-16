@@ -47,25 +47,17 @@
   </header>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import { Search } from 'lucide-vue-next';
 
-export default defineComponent({
-  name: 'HeaderComponent',
-  components: {
-    Search
-  },
-  props: {
-    dark: {
-      type: Boolean,
-      default: true
-    }
-  },
-  setup(props) {
-    return {
-      isDarkMode: props.dark
-    };
+// props 정의
+const props = defineProps({
+  dark: {
+    type: Boolean,
+    default: true
   }
 });
+
+const isDarkMode = computed(() => props.dark);
 </script>

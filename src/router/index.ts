@@ -1,25 +1,28 @@
-import {createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router';
+// src/router/index.ts
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import DashboardView from '@/views/DashboardView.vue';
+import TouristSpotView from '@/views/TouristSpotView.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    name: 'Home',
-    component: () => import('../components/pages/Dashboard.vue')
+    name: 'Dashboard',
+    component: DashboardView
   },
   {
-    path: '/places',
-    name: 'Places',
-    component: () => import('../components/pages/PlacesList.vue')
+    path: '/spots',
+    name: 'TouristSpots',
+    component: TouristSpotView
   },
   {
-    path: '/live',
-    name: 'LiveMonitoring',
-    component: () => import('../components/pages/LiveMonitoring.vue')
+    path: '/spots/:id',
+    name: 'SpotDetail',
+    component: () => import('@/views/SpotDetailView.vue')
   }
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(process.env.BASE_URL),
   routes
 });
 

@@ -1,105 +1,105 @@
 <!-- src/components/dashboard/CrowdStatusCard.vue -->
 <template>
   <div
-      :class="[
-      isDarkMode ? 'bg-gray-800 hover:bg-gray-750' : 'bg-white hover:bg-gray-50',
-      'rounded-lg shadow cursor-pointer transition-all duration-200'
-    ]"
+      class="relative bg-gradient-to-br from-[#232627] to-[#1A1D1F] rounded-lg overflow-hidden cursor-pointer transition-all hover:shadow-lg"
       @click="$emit('select', spot.poi_id)"
   >
-    <div class="p-6">
-      <div class="flex justify-between items-start mb-4">
-        <h3 class="font-bold text-lg">{{ spot.poi_name }}</h3>
-        <span
-            class="text-xs px-2 py-1 rounded-full text-white"
-            :style="{ backgroundColor: crowdLevelInfo.color }"
-        >
-          {{ crowdLevelInfo.level }}
-        </span>
-      </div>
-      <div :class="[
-        'flex justify-between text-sm mb-4',
-        isDarkMode ? 'text-gray-400' : 'text-gray-500'
-      ]">
-        <span>{{ spot.biz_cat_name }}</span>
-        <span>{{ region }}</span>
-      </div>
-      <div :class="[
-        'h-2 rounded-full overflow-hidden mb-4',
-        isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
-      ]">
+    <!-- 카드 헤더 (번호, 아이콘) -->
+    <div class="absolute top-0 left-0 w-full h-1" :style="{ backgroundColor: crowdLevelInfo.color }"></div>
+
+    <div class="p-5">
+      <div class="flex justify-between">
+        <!-- 왼쪽: 순번과 정보 -->
+        <div>
+          <div class="flex items-center">
+            <!-- 카테고리 아이콘 -->
+            <div class="w-8 h-8 bg-blue-500 bg-opacity-20 rounded-full flex items-center justify-center mr-3">
+              <MapPin class="w-4 h-4 text-blue-400" />
+            </div>
+            <h3 class="font-bold text-white text-base">{{ spot.poi_name }}</h3>
+          </div>
+          <div class="mt-3 flex items-center text-gray-400 text-xs">
+            <span>{{ spot.biz_cat_name }}</span>
+            <div class="w-1 h-1 bg-gray-600 rounded-full mx-2"></div>
+            <span>{{ region }}</span>
+          </div>
+        </div>
+
+        <!-- 오른쪽: 혼잡도 상태 배지 -->
         <div
-            class="h-full"
-            :style="{
-            width: `${spot.congestion}%`,
-            backgroundColor: crowdLevelInfo.color
+            class="flex items-center px-2 py-1 rounded-full text-xs"
+            :style="{ backgroundColor: `${crowdLevelInfo.color}25` }"
+            :class="{
+            'text-green-400': crowdLevelInfo.level === '여유',
+            'text-blue-400': crowdLevelInfo.level === '보통',
+            'text-orange-400': crowdLevelInfo.level === '혼잡',
+            'text-red-400': crowdLevelInfo.level === '매우 혼잡'
           }"
-        />
+        >
+          <span>{{ crowdLevelInfo.level }}</span>
+        </div>
       </div>
-      <div class="flex justify-between items-center">
-        <span>현재 혼잡도: {{ spot.congestion }}%</span>
-        <span class="flex items-center">
-          <Users class="h-4 w-4 mr-1" />
-          {{ spot.visitor_count.toLocaleString() }}
-        </span>
+
+      <!-- 방문자 수 -->
+      <div class="mt-5">
+        <div class="flex justify-between text-xs text-gray-400 mb-1.5">
+          <span>현재 혼잡도</span>
+          <span>{{ spot.congestion }}%</span>
+        </div>
+        <div class="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+          <div
+              class="h-full"
+              :style="{
+              width: `${spot.congestion}%`,
+              backgroundColor: crowdLevelInfo.color
+            }"
+          ></div>
+        </div>
       </div>
     </div>
-    <div
-        :class="[
-        'px-6 py-3 border-t flex justify-between items-center',
-        isDarkMode ? 'border-gray-700' : 'border-gray-200'
-      ]"
-    >
-      <span :class="['text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-500']">
-        상세 정보 보기
-      </span>
-      <ChevronRight class="h-4 w-4" />
+
+    <!-- 카드 푸터 -->
+    <div class="px-5 py-3 border-t border-gray-800 flex justify-between items-center">
+      <div class="flex items-center text-gray-400 text-xs">
+        <Users class="w-3.5 h-3.5 mr-1.5" />
+        <span>{{ spot.visitor_count.toLocaleString() }}</span>
+      </div>
+      <div class="text-xs text-gray-500">
+        {{ spot.address.split(' ')[0] }}
+      </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, computed } from 'vue';
-import { Users, ChevronRight } from 'lucide-vue-next';
+<script setup lang="ts">
+import { computed } from 'vue';
+import { MapPin, Users } from 'lucide-vue-next';
 import type { TouristSpot, CrowdLevel } from '@/types';
 
-export default defineComponent({
-  name: 'CrowdStatusCard',
-  components: {
-    Users,
-    ChevronRight
+// props와 emits 정의
+const props = defineProps({
+  spot: {
+    type: Object as () => TouristSpot,
+    required: true
   },
-  props: {
-    spot: {
-      type: Object as () => TouristSpot,
-      required: true
-    },
-    dark: {
-      type: Boolean,
-      default: true
-    }
-  },
-  emits: ['select'],
-  setup(props) {
-    const getCrowdLevel = (level: number): CrowdLevel => {
-      switch(level) {
-        case 1: return { level: '여유', color: '#4CAF50' };
-        case 2: return { level: '보통', color: '#2196F3' };
-        case 3: return { level: '혼잡', color: '#FF9800' };
-        case 4: return { level: '매우 혼잡', color: '#F44336' };
-        default: return { level: '정보없음', color: '#9E9E9E' };
-      }
-    };
-
-    const crowdLevelInfo = computed(() => getCrowdLevel(props.spot.congestion_level));
-
-    const region = computed(() => props.spot.address.split(' ')[0]);
-
-    return {
-      crowdLevelInfo,
-      region,
-      isDarkMode: props.dark
-    };
+  index: {
+    type: Number,
+    default: 0
   }
 });
+
+const emit = defineEmits(['select']);
+
+const getCrowdLevel = (level: number): CrowdLevel => {
+  switch(level) {
+    case 1: return { level: '여유', color: '#4CAF50' };
+    case 2: return { level: '보통', color: '#2196F3' };
+    case 3: return { level: '혼잡', color: '#FF9800' };
+    case 4: return { level: '매우 혼잡', color: '#F44336' };
+    default: return { level: '정보없음', color: '#9E9E9E' };
+  }
+};
+
+const crowdLevelInfo = computed(() => getCrowdLevel(props.spot.congestion_level));
+const region = computed(() => props.spot.address.split(' ')[0]);
 </script>
